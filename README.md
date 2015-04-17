@@ -5,8 +5,13 @@ This is a board game with simple rules that was played for fun when I was a chil
 
 It is written in HTML5/Javascript. It makes use of HTML canvas and local storage.
 
+It runs in a browser (Firefox, Chrome, Safari, Opera, IE) as well as on mobile phone (Android, iOS, others may work but not tested).
+
 The AI uses minimax strategy with alpha-beta prunning. AI code is not included here. AI is made a web service
 available at http://homecox.com/services/sixp/. See http://homecox.com/services/sixp/README for more details.
+
+The code here supports human/computer and computer/computer play. A live version is available at http://cssauh.com/sp. 
+Remote human/human play is developed, but the code is not included here at this time.
 
 Put this code in a web server, you will be able to visit and play.
 
