@@ -11,7 +11,7 @@ The AI uses minimax strategy with alpha-beta prunning. AI code is not included h
 available at http://homecox.com/services/sixp/. See http://homecox.com/services/sixp/README for more details.
 
 The code here supports human/computer and computer/computer play. A live version is available at http://cssauh.com/sp. 
-Remote human/human play is developed, but the code is not included here at this time.
+Remote human/human play is developed in 2015, but the code is not available here at this time.
 
 Put this code in a web server, you will be able to visit and play.
 
