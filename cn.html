@@ -1,0 +1,329 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="Sixp Chess, An HTML5 canvas game.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="user-scalable=no, width=device-width" />
+    <!--[if IE]>
+    <script type="text/javascript" src="javascript/excanvas/excanvas.js"></script>
+    <script type="text/javascript" src="javascript/excanvas/canvas.text.js"></script>
+    <script type="text/javascript" src="javascript/excanvas/faces/optimer-normal-normal.js"></script>
+    <![endif]--> 
+
+    <title>六子棋</title>
+    <script type="text/javascript" language="javascript" src="javascript/jquery-1.6.1.min.js"></script>
+    <script type="text/javascript" src="javascript/midi.min.js"></script>
+
+    <script type="text/javascript" language="javascript">
+    // put this in head to force preload image.
+    var bgImg = new Image();
+    bgImg.src = "image/bg.jpg";
+
+    ///
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-23915255-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+
+    <STYLE type="text/css">
+    input.class1 {
+      height: 24px; width:100px; font-weight: bold; 
+      text-align: center;
+    }
+    </STYLE>
+</head>
+<body onload="javascript:init();" leftmargin="0" rightmargin="0" topmargin="10" bottommargin="0" style="background-image:url(image/green.jpg);">
+
+<center>
+
+<div id="divPlay" style="float: center; text-align: center; vertical-align: top; border: solid 0px;">
+
+    <center>
+
+    <!--[if ! IE]>--> 
+    <canvas id="map" style="z-index: 100; position: relative; border: 1px solid #333333; width:320; height: 320;">
+    <p>您的浏览器不支持HTML5 canvas功能。请使用Firefox，Safari，Chrome，Opera或IE9。</p>
+    </canvas>
+    <canvas id="selectCanvas" style="z-index: 200; position: absolute; width:320; height: 320;"></canvas>
+    <table id="Toolbar" border="0" cellpadding="2" cellspacing="0" bgcolor="#ffffff" style="font-size:12px; width:320;"><tbody>
+    <!--<![endif]-->
+
+    <!--[if IE]> 
+    <canvas id="map" style="z-index: 100; position: relative; border: 1px solid #333333; width:320px; height: 320px;">
+    <p>您的浏览器不支持HTML5 canvas功能。请使用Firefox，Safari，Chrome，Opera或IE9。</p>
+    </canvas>
+    <canvas id="selectCanvas" style="z-index: 200; position: absolute; width:320px; height: 320px;"></canvas>
+    <table id="Toolbar" border="0" cellpadding="2" cellspacing="0" bgcolor="#ffffff" style="font-size:12px; width:320px;"><tbody>
+    <![endif]-->
+
+    <tr style="height: 30px; vertical-align: middle;">
+    <td align="left">下一步： <div id="gameMsg" style="display: inline;"/></td>
+    <td align="right" width="25"><input id="btnOption" value="设置" title="修改设置" onclick="Javascript:toggleOptionPanel();" type="image" src="image/options.jpg" style="height:25px;"/></td>
+    <td align="right" width="25"><input id="btnQ" value="帮助" title="获得帮助" onclick="Javascript:help();" type="image" src="image/help.jpg" style="height:25px;"/></td>
+    <td align="right" width="25"><input id="btnReset" value="重置" title="重置游戏" onclick="Javascript:reset();" type="image" src="image/start.jpg" style="height:23px;width:24px;"/></td>
+    </tr>
+    </tbody></table>
+
+    <div id="divOptionPanel" style="display: none;">
+    <table id="OptionTable" border="0" style="background-image: url('image/bg.jpg'); font-size:12px;">
+    <tr>
+    <td align="center" valign="top" width="50%">
+    
+    <table border="0">
+    <tr><td>
+    <img alt="Computer" title="请选择计算机下的一方" src="image/computer.gif" style="vertical-align: middle;"/> 
+    </td><td align="left">
+        <select id="comSide" title="请选择计算机下的一方">
+        <option selected="selected" value="-1">白棋</option>
+        <option value="1">黑棋</option>
+        <option value="0">黑白都不下</option>
+        <option value="2">黑白都下</option>
+        </select>
+    </td></tr>
+    
+    <tr><td>
+    难度： 
+    </td><td align="left">
+        <select id="gameLevel" title="请选择难度">
+        <option selected="selected" value="1">初级</option>
+        <option value="2" selected="selected">中级</option>
+        <option value="3">高级</option>
+        </select>
+    </td></tr>    
+    
+    <tr><td>
+    音乐：  
+    </td><td align="left">
+        <img alt="播放背景音乐" id="idSound" src="image/sound_mute.png" title="停止背景音乐" onclick="javascript:playMusic();" height="25" style='vertical-align: middle;'/>
+    </td></tr>
+    
+    <tr><td>
+    声音： 
+    </td><td align="left">
+        <img alt="播放走棋声音" id="idToggleSoundMov" src="image/sound.png" title="播放走棋声音" onclick="javascript:playSound();" height="25" style='vertical-align: middle;'/>
+    </td></tr>
+
+    <tr><td>语言： </td><td align="left"><a href="en.html">英文</a> | 中文</td></tr>
+
+    <tr><td colspan="2" align="center">
+        <input type="button" value="保存设置" onclick="javascript: saveChange();" />
+    </td></tr>
+
+    </table>
+    </td>
+
+    <td align="left" valign="top" width="50%">
+
+    <div id="divBoardPosition">
+    棋局： 
+    <input id="btnSaveBoard" type="image" src="image/save.gif" onclick="javascript:saveBoard();" onmousedown="javascript:this.src='image/save2.gif';" onmouseup="javascript:this.src='image/save.gif';" ontouchstart="javascript:this.src='image/save2.gif';" ontouchend="javascript:this.src='image/save.gif';" style="vertical-align: middle;" value="保存" title="保存当前局面"/>
+    <input id="btnRecoverBoard" type="image" src="image/open.png" onclick="javascript:recoverBoard();" onmousedown="javascript:this.src='image/open.gif';" onmouseup="javascript:this.src='image/open.png';" ontouchstart="javascript:this.src='image/open.gif';" ontouchend="javascript:this.src='image/open.png';" style="vertical-align: middle;" value="恢复" title="恢复保存局面"/>
+    <br>
+    <span title="每一步自动保存棋局并在游戏开始时恢复">
+    自动保存恢复： 
+    <input id="idAutoSaveRecover" type="checkbox" style="display: inline; vertical-align: middle;" checked>
+    </span>
+    </div>
+
+    棋谱： <br/><textarea id="divMoveHistory" style="display: inline; border: 0;" rows="5" cols="16" readonly></textarea>
+    </td>
+    </tr>
+    </table></div>
+
+    <div id="divHelpPanel" style="float: center; padding: 5px; font-size: 10pt; 
+     text-align: left; vertical-align: top; border: solid 0px; display: none; 
+     position: absolute; z-index:300; background-color:rgba(255,255,255,0.75); /*IE.START*/background-color: white; opacity:0.75;filter:alpha(opacity=75);/*IE.END*/" 
+     onmouseover="javascript:helpOnStart();" ontouchstart="javascript:helpOnStart();">
+
+    <table width="100%"><tr>
+    <td align="center"><div style="font-size: 14pt; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;六子棋</div></td>
+    <td style="width:30px;">
+    <input type="image" src="image/btnCloseX.gif" onClick="javascript:toggleHelp(false);"/></td>
+    </tr></table>
+
+    <p align="center"><b>规则</b></p>
+    <ul>
+    <li>黑先。</li>
+    <li>行棋一方若将两颗棋子移至一起，且一头挨着对方的一颗棋时，则可吃子。</li>
+    <li>当一方的棋子被对方围困住无法行棋或者被吃到少于两颗棋子时，就被判为输棋。</li>
+    </ul>
+    <p align="center"><b>提示</b></p>
+    <ul>
+    <li>反复点击 <img src="image/options.jpg" style="display: inline; height:14px;"> 显示和隐藏设置。</li>
+    <li>反复点击 <img src="image/help.jpg" style="display: inline; height:14px;"> 显示和隐藏帮助。</li>
+    <li>点击 <img src="image/start.jpg" style="display: inline; height:14px;"> 重置游戏。</li>
+    <!--[if IE]> 
+    <li>请使用支持HTML5的浏览器以获得更好的效果, 如Firefox，Safari，Chrome，Opera或IE9。</li>
+    <!--<![endif]-->
+    </ul>
+    </div>
+        
+    </center>
+
+    <div id="log"></div>
+    <div id="debug"></div>
+
+    <img alt="" src="image/bg.jpg" width="0" height="0"/>
+</div>
+<!-- End Content -->
+</center>
+
+<div id="divSound"></div>
+<audio id="idSoundEat" preload="auto" autobuffer src="sound/Eat.wav"/>
+<audio id="idSoundMov" preload="auto" autobuffer src="sound/Mov.wav"/>
+<audio id="idSoundSav" preload="auto" autobuffer src="sound/Saved.wav"/>
+<!--For IE. START-->
+<div id="divSoundEatIE"></div>
+<div id="divSoundMovIE"></div>
+<!--For IE. END-->
+
+<!--[if ! IE]>--> 
+<script type="text/javascript" src="javascript/sixp.min.js"></script> 
+<script type="text/javascript">
+var langWords = Array("开始!", "白棋胜!", "黑棋胜!", "   比赛结束: ", " 你赢了! ", " 你输了! ",
+                      "播放背景音乐", "停止背景音乐", "播放走棋声音", "停止走棋声音");
+</script>
+<!--<![endif]-->
+
+<!--[if IE]> 
+<script type="text/javascript" src="javascript/sixp.ie.min.js"></script> 
+<script type="text/javascript">
+var langWords = Array("开始!", "白棋胜!", "黑棋胜!", "Game Over: ", " You Win! ", " You lost! ",
+                      "播放背景音乐", "停止背景音乐", "播放走棋声音", "停止走棋声音");
+</script>
+<![endif]-->
+
+<script type="text/javascript">
+<!--
+var c;
+var bgmusic = new MidiPlayer("sound/Bach.mid", "divSound", true, 0);
+
+function init() {
+    c = new Chess6p();
+    toggleHelp(true);
+    //toggleOptionPanel();
+    playMusic(); // For default state of play/stop, change line 104 title of idSound.
+    playSound();
+}
+
+
+function reset() {
+    c.reset(); 
+}
+
+function toggleOptionPanel() {
+    var d = document.getElementById("divOptionPanel");
+    if (!d) { return; }
+    
+    if (d.style.display == 'none') { $("#divOptionPanel").show(1000); }
+    else { $("#divOptionPanel").hide(1000); }
+}
+
+function saveChange() {
+    c.updateConfig();
+    c.saveConfig();
+    reset();
+    toggleOptionPanel();
+}
+
+function playMusic() {
+    var o = document.getElementById('idSound');
+    var sound = document.getElementById("divSound");
+    if (o.title == '播放背景音乐') {
+        if (navigator.appName == "Microsoft internet Explorer") {
+            sound.innerHTML = '<bgsound src="sound/Bach.mid" loop="1">';
+        } else {
+            //sound.innerHTML = '<embed src="sound/Bach.mid" hidden="true" border="0" width="0" height="2" autostart="true" loop="true">';
+            bgmusic.play();
+        }
+        o.title = '停止背景音乐';
+        o.src = 'image/sound.png';
+    } else {
+        //if (sound) sound.innerHTML = '';
+        bgmusic.stop();
+        o.title = '播放背景音乐';
+        o.src = 'image/sound_mute.png';
+    }
+}
+
+function playSound(o) {
+    var o = document.getElementById('idToggleSoundMov');
+    var sound = document.getElementById("divSoundMov");
+    if (o.title == '播放走棋声音') {
+        c.setUseSoundMov(true);
+        o.title = '停止走棋声音';
+        o.src = 'image/sound.png';
+        playSoundMov();
+    } else {
+        c.setUseSoundMov(false);
+        o.title = '播放走棋声音';
+        o.src = 'image/sound_mute.png';
+    }
+}
+
+function playSoundEat() {
+    var v = document.getElementById("idSoundEat");
+    if (v && v.play) { v.play(); }
+    else {
+        v = document.getElementById("divSoundEatIE");
+        if (v) v.innerHTML = '<embed src="sound/Eat.wav" hidden="true" border="0" width="0" height="0" autostart="true" loop="false">';    
+    }
+}
+
+function playSoundMov() {
+    var v = document.getElementById("idSoundMov");
+    if (v && v.play) { v.play(); }
+    else {
+        v = document.getElementById("divSoundMovIE");
+        if (v) v.innerHTML = '<embed src="sound/Mov.wav" hidden="true" border="0" width="0" height="0" autostart="true" loop="false">';
+    }
+}
+
+function playSoundSav() {
+    var v = document.getElementById("idSoundSav");
+    if (v && v.play) { v.play(); }
+}
+
+function help() {
+    //c.toggleHelp();
+    var d = document.getElementById("divHelpPanel");
+    if (!d) { return; }
+
+    if (d.style.display == 'none') { $("#divHelpPanel").show(); }
+    else { $("#divHelpPanel").hide(); }
+}
+
+function toggleHelp(v) {
+    document.getElementById("divHelpPanel").style.display = v ? "block" : "none";
+} 
+
+function helpOnStart() {
+    if (c.onStart) {
+        toggleHelp(false);
+        c.onStart = false;
+    }
+}
+
+function saveBoard() {
+    c.saveBoard();
+    playSoundSav();
+}
+
+function recoverBoard() {
+    c.recoverBoard();
+    playSoundMov();
+}
+
+//-->
+</script> 
+
+<script src="http://app.baidu.com/static/appstore/monitor.st"></script>
+
+</body></html>

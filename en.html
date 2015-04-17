@@ -1,0 +1,321 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="Sixp Chess, An HTML5 canvas game.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="user-scalable=no, width=device-width" />
+    <!--[if IE]>
+    <script type="text/javascript" src="javascript/excanvas/excanvas.js"></script>
+    <script type="text/javascript" src="javascript/excanvas/canvas.text.js"></script>
+    <script type="text/javascript" src="javascript/excanvas/faces/optimer-normal-normal.js"></script>
+    <![endif]--> 
+    
+    <title>Six-Piece Chess</title>
+    <script type="text/javascript" language="javascript" src="javascript/jquery-1.6.1.min.js"></script>
+    <script type="text/javascript" src="javascript/midi.min.js"></script>
+
+    <script type="text/javascript" language="javascript">
+    // Force preload image.
+    var bgImg = new Image();
+    bgImg.src = "image/bg.jpg";
+
+    ///
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-23915255-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+
+    <STYLE type="text/css">
+    input.class1 {
+      height: 24px; width:100px; font-weight: bold; 
+      text-align: center;
+    }
+    </STYLE>
+</head>
+<body onload="javascript:init();" leftmargin="0" rightmargin="0" topmargin="10" bottommargin="0" style="background-image:url(image/green.jpg);">
+
+<center>
+
+<div id="divPlay" style="float: center; text-align: center; vertical-align: top; border: solid 0px;">
+
+    <center>
+
+    <!--[if ! IE]>--> 
+    <canvas id="map" style="z-index: 100; position: relative; border: 1px solid #333333; width:320; height: 320;">
+    <p>Your browser does not support HTML5 canvas. Please use Firefox, Safara, Chrome, Opera or IE9.</p>
+    </canvas>
+    <canvas id="selectCanvas" style="z-index: 200; position: absolute; width:320; height: 320;"></canvas>
+    <table id="Toolbar" border="0" cellpadding="2" cellspacing="0" bgcolor="#ffffff" style="font-size:12px; width:320;"><tbody>
+    <!--<![endif]-->
+
+    <!--[if IE]> 
+    <canvas id="map" style="z-index: 100; position: relative; border: 1px solid #333333; width:320px; height: 320px;">
+    <p>Your browser does not support HTML5 canvas. Please use Firefox, Safara, Chrome, Opera or IE9.</p>
+    </canvas>
+    <canvas id="selectCanvas" style="z-index: 200; position: absolute; width:320px; height: 320px;"></canvas>
+    <table id="Toolbar" border="0" cellpadding="2" cellspacing="0" bgcolor="#ffffff" style="font-size:12px; width:320px;"><tbody>
+    <![endif]-->
+
+    <tr style="height: 30px; vertical-align: middle;">
+    <td align="left">Next Move: <div id="gameMsg" style="display: inline;"/></td>
+    <td align="right" width="25"><input id="btnOption" value="Options" title="Set Options" onclick="Javascript:toggleOptionPanel();" type="image" src="image/options.jpg" style="height:25px;"/></td>
+    <td align="right" width="25"><input id="btnQ" value="Help" title="Get Help" onclick="Javascript:help();" type="image" src="image/help.jpg" style="height:25px;"/></td>
+    <td align="right" width="25"><input id="btnReset" value="Reset" title="Reset Game" onclick="Javascript:reset();" type="image" src="image/start.jpg" style="height:23px;width:24px;"/></td>
+    </tr>
+    </tbody></table>
+
+    <div id="divOptionPanel" style="display: none;">
+    <table id="OptionTable" border="0" style="background-image: url('image/bg.jpg'); font-size:12px;">
+    <tr>
+    <td align="center" valign="top" width="50%">
+    
+    <table border="0">
+    <tr><td>
+    <img alt="Computer" title="Select the side computer plays" src="image/computer.gif" style="vertical-align: middle;"/> 
+    </td><td align="left">
+        <select id="comSide" title="Select the side computer plays">
+        <option selected="selected" value="-1">White</option>
+        <option value="1">Black</option>
+        <option value="0">Neither</option>
+        <option value="2">Both</option>
+        </select>
+    </td></tr>
+    
+    <tr><td>
+    Level: 
+    </td><td align="left">
+        <select id="gameLevel" title="Select difficulty level">
+        <option selected="selected" value="1">Beginner</option>
+        <option value="2" selected="selected">Intermediate</option>
+        <option value="3">Advanced</option>
+        </select>
+    </td></tr>    
+    
+    <tr><td>
+    Music: 
+    </td><td align="left">
+        <img alt="Play Music" id="idSound" src="image/sound_mute.png" title="Stop Music" onclick="javascript:playMusic();" height="25" style='vertical-align: middle;'/>
+    </td></tr>
+    
+    <tr><td>
+    Sound: 
+    </td><td align="left">
+        <img alt="Play Sound" id="idToggleSoundMov" src="image/sound.png" title="Play Sound" onclick="javascript:playSound();" height="25" style='vertical-align: middle;'/>
+    </td></tr>
+
+    <tr><td>Language: </td><td align="left"><font size="-1">English | <a href="cn.html">Chinese</a></font></td></tr>
+
+    <tr><td colspan="2" align="center">
+        <input type="button" value="Save Change" onclick="javascript: saveChange();" />
+    </td></tr>
+
+    </table>
+    </td>
+
+    <td align="left" valign="top" width="50%">
+
+    <div id="divBoardPosition">
+    Board Position: 
+    <input id="btnSaveBoard" type="image" src="image/save.gif" onclick="javascript:saveBoard();" onmousedown="javascript:this.src='image/save2.gif';" onmouseup="javascript:this.src='image/save.gif';" ontouchstart="javascript:this.src='image/save2.gif';" ontouchend="javascript:this.src='image/save.gif';" style="vertical-align: middle;" value="Save" title="Save board position"/>
+    <input id="btnRecoverBoard" type="image" src="image/open.png" onclick="javascript:recoverBoard();" onmousedown="javascript:this.src='image/open.gif';" onmouseup="javascript:this.src='image/open.png';" ontouchstart="javascript:this.src='image/open.gif';" ontouchend="javascript:this.src='image/open.png';" style="vertical-align: middle;" value="Recover" title="Open saved board position"/>
+    <br>
+    <span title="For board position, automatically save each step and open when game starts">
+    Automatic Save/Open: 
+    <input id="idAutoSaveRecover" type="checkbox" style="display: inline; vertical-align: middle;" checked>
+    </span>
+    </div>
+
+    Move History: <br/><textarea id="divMoveHistory" style="display: inline; border: 0;" rows="5" cols="16" readonly></textarea>
+    </td>
+    </tr>
+    </table></div>
+
+    <div id="divHelpPanel" style="float: center; padding: 5px; font-size: 10pt; 
+     text-align: left; vertical-align: top; border: solid 0px; display: none; 
+     position: absolute; z-index:300; background-color:rgba(255,255,255,0.75); /*IE.START*/background-color: white; opacity:0.75;filter:alpha(opacity=75);/*IE.END*/" 
+     onmouseover="javascript:helpOnStart();" ontouchstart="javascript:helpOnStart();">
+
+    <table width="100%"><tr>
+    <td align="center"><div style="font-size: 14pt; font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Six-Piece Chess</div></td>
+    <td style="width:30px;">
+    <input type="image" src="image/btnCloseX.gif" onClick="javascript:toggleHelp(false);"/></td>
+    </tr></table>
+
+    <p align="center"><b>Rules</b></p>
+    <ul>
+    <li>Black starts first.</li>
+    <li>
+    Moving side kills opponent's piece when:<br/>
+    1) moving side moves 2 pieces together,<br/>
+    2) 1 of the 2 pieces is next to opponent's piece,<br/>
+    3) there are only 3 pieces on this row/column.
+    </li>
+    <li>One side loses when has &lt; 2 pieces or can't move.</li>
+    </ul>
+    <p align="center"><b>Tips</b></p>
+    <ul>
+    <li>Toggle <img src="image/options.jpg" style="display: inline; height:14px;"> to change options.</li>
+    <li>Toggle <img src="image/help.jpg" style="display: inline; height:14px;"> to get help.</li>
+    <li>Click on <img src="image/start.jpg" style="display: inline; height:14px;"> to reset a game.</li>
+    <!--[if IE]> 
+    <li>Use HTML5 compatible browsers for better quality: Firefox, Safari, Chrome, Opera or IE9.</li>
+    <!--<![endif]-->
+    </ul>
+    </div>
+        
+    </center>
+
+    <div id="log"></div>
+    <div id="debug"></div>
+
+    <img alt="" src="image/bg.jpg" width="0" height="0"/>
+</div>
+<!-- End Content -->
+</center>
+
+<div id="divSound"></div>
+<audio id="idSoundEat" preload="auto" autobuffer src="sound/Eat.wav"/>
+<audio id="idSoundMov" preload="auto" autobuffer src="sound/Mov.wav"/>
+<audio id="idSoundSav" preload="auto" autobuffer src="sound/Saved.wav"/>
+<!--For IE. START-->
+<div id="divSoundEatIE"></div>
+<div id="divSoundMovIE"></div>
+<!--For IE. END-->
+
+<!--[if ! IE]>--> <script type="text/javascript" src="javascript/sixp.min.js"></script> <!--<![endif]-->
+<!--[if IE]> <script type="text/javascript" src="javascript/sixp.ie.min.js"></script> <![endif]-->
+
+<script type="text/javascript">
+<!--
+var c;
+var langWords = Array("Start!", "White Win!", "Black Win!", "Game Over: ", " You Win! ", " You lost! ",
+                      "Play Music", "Stop Music", "Play Sound", "Stop Sound");
+var bgmusic = new MidiPlayer("sound/Bach.mid", "divSound", true, 0);
+
+function init() {
+    c = new Chess6p();
+    toggleHelp(true); 
+    //toggleOptionPanel();
+    playMusic(); // For default state of play/stop, change line 104 title of idSound.
+    playSound();
+}
+
+function reset() {
+    c.reset(); 
+}
+
+function toggleOptionPanel() {
+    var d = document.getElementById("divOptionPanel");
+    if (!d) { return; }
+    
+    if (d.style.display == 'none') { $("#divOptionPanel").show(1000); }
+    else { $("#divOptionPanel").hide(1000); }
+}
+
+function saveChange() {
+    c.updateConfig();
+    c.saveConfig();
+    reset();
+    toggleOptionPanel();
+}
+
+function playMusic() {
+    var o = document.getElementById('idSound');
+    var sound = document.getElementById("divSound");
+    if (o.title == 'Play Music') {
+        if (navigator.appName == "Microsoft internet Explorer") {
+            sound.innerHTML = '<bgsound src="sound/Bach.mid" loop="1">';
+        } else {
+            //sound.innerHTML = '<embed src="sound/Bach.mid" hidden="true" border="0" width="0" height="2" autostart="true" loop="true">';
+            bgmusic.play();
+        }
+        o.title = 'Stop Music';
+        o.src = 'image/sound.png';
+    } else {
+        //if (sound) sound.innerHTML = ''; 
+        bgmusic.stop();
+        o.title = 'Play Music';
+        o.src = 'image/sound_mute.png';
+    }
+}
+
+function playSound(o) {
+    var o = document.getElementById('idToggleSoundMov');
+    if (o.title == 'Play Sound') {
+        c.setUseSoundMov(true);
+        o.title = 'Stop Sound';
+        o.src = 'image/sound.png';
+        playSoundMov();
+    } else {
+        c.setUseSoundMov(false);
+        o.title = 'Play Sound';
+        o.src = 'image/sound_mute.png';
+    }
+}
+
+function playSoundEat() {
+    var v = document.getElementById("idSoundEat");
+    if (v && v.play) { v.play(); }
+    else {
+        v = document.getElementById("divSoundEatIE");
+        if (v) v.innerHTML = '<embed src="sound/Eat.wav" hidden="true" border="0" width="0" height="0" autostart="true" loop="false">';    
+    }
+}
+
+function playSoundMov() {
+    var v = document.getElementById("idSoundMov");
+    if (v && v.play) { v.play(); }
+    else {
+        v = document.getElementById("divSoundMovIE");
+        if (v) v.innerHTML = '<embed src="sound/Mov.wav" hidden="true" border="0" width="0" height="0" autostart="true" loop="false">';
+    }
+}
+
+function playSoundSav() {
+    var v = document.getElementById("idSoundSav");
+    if (v && v.play) { v.play(); }
+}
+
+function help() {
+    //c.toggleHelp();
+    var d = document.getElementById("divHelpPanel");
+    if (!d) { return; }
+
+    if (d.style.display == 'none') { $("#divHelpPanel").show(); }
+    else { $("#divHelpPanel").hide(); }
+}
+
+function toggleHelp(v) {
+    document.getElementById("divHelpPanel").style.display = v ? "block" : "none";
+} 
+
+function helpOnStart() {
+    if (c.onStart) {
+        toggleHelp(false);
+        c.onStart = false;
+    }
+}
+
+function saveBoard() {
+    c.saveBoard();
+    playSoundSav();
+}
+
+function recoverBoard() {
+    c.recoverBoard();
+    playSoundMov();
+}
+
+//-->
+</script> 
+
+<script src="http://app.baidu.com/static/appstore/monitor.st"></script>
+
+</body></html>
