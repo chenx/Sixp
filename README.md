@@ -1,7 +1,7 @@
 # Sixp
 Six-Piece Chess
 
-This is a board game with simple rules that was played for fun when I was a child. Then I made it into a computer game in the summary of 2011.
+This is a board game with simple rules that was played for fun when I was a child. Then I made it into a computer game.
 
 It is written in HTML5/Javascript. It makes use of HTML canvas and local storage.
 
@@ -21,4 +21,3 @@ Enjoy!
 Author
 -----
 X. Chen  
-Copyright @ 2011
